@@ -27,3 +27,4 @@ https://www.postgresql.org/download/linux/debian/
 - разрешаем работать с PostgreSQL по локальной сети (postgresql.conf и pg_hba.conf)
   > проверяем: sudo netstat -plunt |grep postgres \
   (видим: 0 0.0.0.0:5432)
+- настроим параметры работы PostgreSQL под текущее "железо"
