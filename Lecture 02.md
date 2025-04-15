@@ -1,32 +1,42 @@
-Описание/Пошаговая инструкция выполнения домашнего задания:
-создать новый проект в Яндекс облако или на любых ВМ, докере
-далее создать инстанс виртуальной машины с дефолтными параметрами
-добавить свой ssh ключ в metadata ВМ
-зайти удаленным ssh (первая сессия), не забывайте про ssh-add
-поставить PostgreSQL
-зайти вторым ssh (вторая сессия)
-запустить везде psql из под пользователя postgres
-выключить auto commit
-сделать
+## Работа с транзакциями в PostgreSQL
+- открываем две сессии в psql
+- в обеих отключаем AUTOCOMMIT:
+```
+\set AUTOCOMMIT off
+```
+- в первой сессии создаём таблицу и заполняем её данными:
+```
+create table persons(id serial, first_name text, second_name text);
+insert into persons(first_name, second_name) values('ivan', 'ivanov'), ('petr', 'petrov');
+commit;
+```
+- смотрим на текущий уровень изоляции:
+```
+show transaction isolation level;
+```
+ответ: read committed
 
-в первой сессии новую таблицу и наполнить ее данными create table persons(id serial, first_name text, second_name text); insert into persons(first_name, second_name) values('ivan', 'ivanov'); insert into persons(first_name, second_name) values('petr', 'petrov'); commit;
+## read committed транзакции
 
-посмотреть текущий уровень изоляции: show transaction isolation level
-начать новую транзакцию в обоих сессиях с дефолтным (не меняя) уровнем изоляции
-в первой сессии добавить новую запись insert into persons(first_name, second_name) values('sergey', 'sergeev');
-сделать select from persons во второй сессии
-видите ли вы новую запись и если да то почему?
-завершить первую транзакцию - commit;
-сделать select from persons во второй сессии
-видите ли вы новую запись и если да то почему?
-завершите транзакцию во второй сессии
-начать новые но уже repeatable read транзации - set transaction isolation level repeatable read;
-в первой сессии добавить новую запись insert into persons(first_name, second_name) values('sveta', 'svetova');
-сделать select* from persons во второй сессии*
-видите ли вы новую запись и если да то почему?
-завершить первую транзакцию - commit;
-сделать select from persons во второй сессии
-видите ли вы новую запись и если да то почему?
-завершить вторую транзакцию
-сделать select * from persons во второй сессии
-видите ли вы новую запись и если да то почему?
+- в обоих терминалах открываем транзакции: begin;
+- в первом терминале: insert into persons(first_name, second_name) values('sergey', 'sergeev');
+- во втором терминале: select * from persons;
+результат: две записи, ПОЧЕМУ?
+
+- в первом терминале: commit;
+- во втором терминале: select * from persons;
+результат: три записи, ПОЧЕМУ?
+- закрываем транзакцию во втором терминале
+
+#### repeatable read транзации
+
+- в обоих терминалах: begin; set transaction isolation level repeatable read;
+- в первом терминале: insert into persons(first_name, second_name) values('sveta', 'svetova');
+- во втором терминале: select * from persons;
+результат: три записи, новой записи нет, ПОЧЕМУ?
+- в первом терминале: commit;
+- во втором терминале: select * from persons;
+результат: три записи, новой записи нет, ПОЧЕМУ?
+- во втором терминале: commit;
+- во втором терминале: select * from persons;
+результат: четыре записи, ПОЧЕМУ?
