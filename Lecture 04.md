@@ -1,14 +1,9 @@
-#### Создадим новую БД
-- войдём под postgres:
-> su postgres
-- запустим psql
-> psql
-- создадим новую БД:
-> create database TEST;
-- сменим текущую БД:
-> \c TEST
-#### Создадим таблицу и заполним её:
+#### Создадим новую БД (перед этим в template1 было добавлено расширение citext)
 ```
+su postgres
+psql
+create database TEST;
+\c TEST
 create table test(c1 citext);
 insert into test values('тест 1');
 \q
