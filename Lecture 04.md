@@ -7,20 +7,14 @@
 > create database TEST;
 - сменим текущую БД:
 > \c TEST
-- создадим таблицу и заполним её:
+#### Создадим таблицу и заполним её:
 ```
 create table test(c1 citext);
 insert into test values('тест 1');
+\q
 ```
 
 Описание/Пошаговая инструкция выполнения домашнего задания:
-создайте виртуальную машину c Ubuntu 20.04/22.04 LTS в ЯО/Virtual Box/докере
-поставьте на нее PostgreSQL 15 через sudo apt
-проверьте что кластер запущен через sudo -u postgres pg_lsclusters
-зайдите из под пользователя postgres в psql и сделайте произвольную таблицу с произвольным содержимым
-postgres=# create table test(c1 text);
-postgres=# insert into test values('1');
-\q
 остановите postgres например через sudo -u postgres pg_ctlcluster 15 main stop
 создайте новый диск к ВМ размером 10GB
 добавьте свеже-созданный диск к виртуальной машине - надо зайти в режим ее редактирования и дальше выбрать пункт attach existing disk
