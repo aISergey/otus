@@ -14,13 +14,18 @@ insert into test values('тест 1');
 \q
 ```
 
+#### Создадим новый диск /mnt/pg_data
+( https://www.digitalocean.com/community/tutorials/how-to-partition-and-format-storage-devices-in-linux ) \
+(ссылка доступна только через прокси)
+#### Перенос данных кластера /17/main на новый диск
+- остановим PostgreSQL:
+> sudo systemctl stop postgresql@17-main
+- дадим права пользователю postgres на новый раздел (станет владельцем):
+> chown -R postgres:postgres /mnt/pg_data/
+- переносим данные кластера:
+> 
+
 Описание/Пошаговая инструкция выполнения домашнего задания:
-остановите postgres например через sudo -u postgres pg_ctlcluster 15 main stop
-создайте новый диск к ВМ размером 10GB
-добавьте свеже-созданный диск к виртуальной машине - надо зайти в режим ее редактирования и дальше выбрать пункт attach existing disk
-проинициализируйте диск согласно инструкции и подмонтировать файловую систему, только не забывайте менять имя диска на актуальное, в вашем случае это скорее всего будет /dev/sdb - https://www.digitalocean.com/community/tutorials/how-to-partition-and-format-storage-devices-in-linux
-перезагрузите инстанс и убедитесь, что диск остается примонтированным (если не так смотрим в сторону fstab)
-сделайте пользователя postgres владельцем /mnt/data - chown -R postgres:postgres /mnt/data/
 перенесите содержимое /var/lib/postgres/15 в /mnt/data - mv /var/lib/postgresql/15/mnt/data
 попытайтесь запустить кластер - sudo -u postgres pg_ctlcluster 15 main start
 напишите получилось или нет и почему
