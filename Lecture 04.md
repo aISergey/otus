@@ -24,7 +24,7 @@ insert into test values('тест 1');
 получаем ошибку - логично, данные кластера переехали!
 - исправим ошибку, отредактируем файл /etc/postgresql/17/main/postgresql.conf
 > data_directory = '/var/lib/postgresql/17/main' \
-меняем на:
+меняем на: \
 > data_directory = '/mnt/pg_data/17/main'
 - снова запускаем кластер:
 > sudo systemctl start postgresql@17-main
