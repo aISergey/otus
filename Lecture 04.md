@@ -1,3 +1,18 @@
+#### Создадим новую БД
+- войдём под postgres:
+> su postgres
+- запустим psql
+> psql
+- создадим новую БД:
+> create database TEST;
+- сменим текущую БД:
+> \c TEST
+- создадим таблицу и заполним её:
+```
+create table test(c1 citext);
+insert into test values('тест 1');
+```
+
 Описание/Пошаговая инструкция выполнения домашнего задания:
 создайте виртуальную машину c Ubuntu 20.04/22.04 LTS в ЯО/Virtual Box/докере
 поставьте на нее PostgreSQL 15 через sudo apt
