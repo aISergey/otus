@@ -25,5 +25,5 @@ https://www.postgresql.org/download/linux/debian/
 > sudo pg_createcluster --locale ru_RU.UTF-8 --start 17 main
 - устанавливаем пароль суперадмина
 - разрешаем работать с PostgreSQL по локальной сети (postgresql.conf и pg_hba.conf)
-  > проверяем: sudo netstat -plunt |grep postgres
+  > проверяем: sudo netstat -plunt |grep postgres \
   (видим: 0 0.0.0.0:5432)
