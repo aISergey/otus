@@ -7,18 +7,18 @@ create table persons(id serial, first_name text, second_name text);
 insert into persons(first_name, second_name) values('ivan', 'ivanov'), ('petr', 'petrov');
 commit;
 ```
-- смотрим на текущий уровень изоляции: ` show transaction isolation level; `
+- смотрим на текущий уровень изоляции: ` show transaction isolation level; ` \
 ответ: read committed
 
 ## read committed транзакции
 
 - в обоих терминалах открываем транзакции:  `begin;`
 - в первом терминале: `insert into persons(first_name, second_name) values('sergey', 'sergeev');`
-- во втором терминале: `select * from persons;`
+- во втором терминале: `select * from persons;` \
 результат: две записи, т.к. терминалы работают со своими отдельными копиями данных в рамках своих транзакций.
 
 - в первом терминале: `commit;`
-- во втором терминале: `select * from persons;`
+- во втором терминале: `select * from persons;` \
 результат: три записи - первая сессия перенесла данные своей копии в боевую базу, а вторая сессия, при повторном чтении данных, формирует новую копию данных из боевой базы.
 - закрываем транзакцию во втором терминале
 
@@ -26,11 +26,11 @@ commit;
 
 - в обоих терминалах: `begin set transaction isolation level repeatable read;`
 - в первом терминале: `insert into persons(first_name, second_name) values('sveta', 'svetova');`
-- во втором терминале: `select * from persons;`
+- во втором терминале: `select * from persons;` \
 результат: три записи, новой записи нет, т.к. терминалы работают со своими отдельными копиями данных в рамках своих транзакций.
 - в первом терминале: `commit;`
-- во втором терминале: `select * from persons;`
+- во втором терминале: `select * from persons;` \
 результат: три записи, новой записи нет - первая сессия перенесла данные своей копии в боевую базу, но вторая сессия продолжает работать со своей копией данных, т.к. свою транзакцию ещё не закрыла.
 - во втором терминале: `commit;`
-- во втором терминале: `select * from persons;`
+- во втором терминале: `select * from persons;` \
 результат: четыре записи - вторая сессия наконец-то закрыла свою транзакцию, и открыла новую, получив обновлённую копию боевых данных.
