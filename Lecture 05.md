@@ -1,17 +1,32 @@
-<div class="text text_p-small text_default text_bold">Описание/Пошаговая инструкция выполнения домашнего задания:</div>
+#### Подготовка теста
+- создадим новый кластер:
+```
+sudo pg_createcluster --locale ru_RU.UTF-8 --start 17 otus_1
+```
+- ещё раз проверим список работающих кластеров, видим рабочий порт нового кластера - 5433:
+```
+sudo pg_lsclusters
+```
+- заходим в новый кластер:
+```
+su postgres \
+psql -w -p5433
+```
+- создадим базу данных testdb:
+```
+create database testdb; \
+\c testdb
+```
+- создаём схему **testnm**: ```CREATE SCHEMA testnm;```
+- новая таблица **testnm.t1**: ```CREATE TABLE testnm.t1(c1 integer);```
+- добавим данные в **testnm.t1**: ```INSERT INTO testnm.t1 values(1);```
+- новая роль **readonly**: ```CREATE role readonly;```
+- права **readonly** на подключение к **testdb**: ```grant connect on DATABASE testdb TO readonly;```
+- права **readonly** на использование схемы **testnm**: ```grant usage on SCHEMA testnm to readonly;```
+- права **readonly** на SELECT всех таблиц схемы **testnm**: ```grant SELECT on all TABLEs in SCHEMA testnm TO readonly;```
+- 
 
 <div class="text text_p-small text_default learning-markdown js-learning-markdown"><ol>
-<li>создайте новый кластер PostgresSQL 14 </li>
-<li>зайдите в созданный кластер под пользователем postgres</li>
-<li>создайте новую базу данных testdb</li>
-<li>зайдите в созданную базу данных под пользователем postgres</li>
-<li>создайте новую схему testnm</li>
-<li>создайте новую таблицу t1 с одной колонкой c1 типа integer</li>
-<li>вставьте строку со значением c1=1</li>
-<li>создайте новую роль readonly</li>
-<li>дайте новой роли право на подключение к базе данных testdb</li>
-<li>дайте новой роли право на использование схемы testnm</li>
-<li>дайте новой роли право на select для всех таблиц схемы testnm</li>
 <li>создайте пользователя testread с паролем test123</li>
 <li>дайте роль readonly пользователю testread</li>
 <li>зайдите под пользователем testread в базу данных testdb</li>
