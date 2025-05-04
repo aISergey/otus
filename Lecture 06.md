@@ -46,7 +46,31 @@ tps = 535.861620 (including reconnection times)
 ```
 
 #### Задание со звездой
+- установим:
+```
+curl -s https://packagecloud.io/install/repositories/akopytov/sysbench/script.deb.sh | sudo bash
+sudo apt -y install sysbench
+```
+- запустим: `sysbench --threads=4 --time=120 --report-interval=30 --db-driver=pgsql --pgsql-port=5433 --pgsql-user=postgres --pgsql-password=**** --pgsql-db=testdb cpu run`
+> варианты: 'fileio cpu memory threads mutex'
 
-<div class="text text_p-small text_default learning-markdown js-learning-markdown"><ul>
-<p><br>Задание со *: аналогично протестировать через утилиту <a target="_blank" href="https://github.com/Percona-Lab/sysbench-tpcc" title="https://github.com/Percona-Lab/sysbench-tpcc">https://github.com/Percona-Lab/sysbench-tpcc</a> (требует установки<br><a target="_blank" href="https://github.com/akopytov/sysbench" title="https://github.com/akopytov/sysbench">https://github.com/akopytov/sysbench</a>)</p>
-</div>
+**результат:**
+```
+CPU speed:
+    events per second: 14233.57
+
+General statistics:
+    total time:                          120.0012s
+    total number of events:              1708057
+
+Latency (ms):
+         min:                                    0.26
+         avg:                                    0.28
+         max:                                    4.99
+         95th percentile:                        0.29
+         sum:                               479740.80
+
+Threads fairness:
+    events (avg/stddev):           427014.2500/125.28
+    execution time (avg/stddev):   119.9352/0.00
+```
