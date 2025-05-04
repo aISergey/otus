@@ -53,7 +53,7 @@ select pg_size_pretty(pg_total_relation_size('test_tbl'));
 ```
 **результат:** 35 MB
 
-- отключим : `alter table test_tbl set (autovacuum_enabled = off);`
+- отключим autovacuum: `alter table test_tbl set (autovacuum_enabled = off);`
 - обновим 5 раз таблицу, добавив символ 'a': `update test_tbl set col1 = col1 || 'a';`
 - проверяем размер: 237MB
 - количество мёртвых строк:
@@ -63,7 +63,7 @@ from pg_stat_user_TABLEs WHERE (relname = 'test_tbl');
 ```
 **результат:**  n_dead_tup=4999870; ratio%=499; last_autovacuum=<5 минут назад>;  n_live_tup=1_000_000
 
-- включаем автовакуум: `alter table test_tbl set (autovacuum_enabled = on);`
+- включаем autovacuum: `alter table test_tbl set (autovacuum_enabled = on);`
 - подождали минуту: n_dead_tup=0; ratio%=0; last_autovacuum=<только что>;  n_live_tup=1_000_000
 - размер: 237MB
 - обновим таблицу ещё 5 раз, добавив символ 'b': `update test_tbl set col1 = col1 || 'b';`
