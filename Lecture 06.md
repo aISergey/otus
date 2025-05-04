@@ -52,7 +52,7 @@ curl -s https://packagecloud.io/install/repositories/akopytov/sysbench/script.de
 sudo apt -y install sysbench
 ```
 - запустим: `sysbench --threads=4 --time=120 --report-interval=30 --db-driver=pgsql --pgsql-port=5433 --pgsql-user=postgres --pgsql-password=**** --pgsql-db=testdb cpu run`
-> варианты: 'fileio cpu memory threads mutex'
+> варианты: `fileio cpu memory threads mutex`
 
 **результат:**
 ```
