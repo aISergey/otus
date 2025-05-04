@@ -20,8 +20,9 @@ wal_buffers = 16MB
 - рестартуем кластер: `sudo pg_ctlcluster 17 otus_1 restart`
 - переходим в папку с программой: `cd /usr/lib/postgresql/17/bin`
 - инициализируем: `./pgbench -i -p 5433 testdb`
-- запускаем тест: `./pgbench -p 5433 -c 200 -j 4 -P 30 -T 120 testdb` \
+- запускаем тест: `./pgbench -p 5433 -c 200 -j 4 -P 30 -T 120 testdb`
 > порт 5433 (кластер otus_1); 200 подключений; 4 потока; с выводом отчёта каждые 30 секунд; в течении 120 секунд; база данных testdb \
+
 **результат:**
 ```
 number of transactions actually processed: 99359
@@ -32,7 +33,8 @@ initial connection time = 86.101 ms
 tps = 824.337242 (without initial connection time)
 ```
 - добавим к тесту -С: `./pgbench -p 5433 -c 200 -C -j 4 -P 30 -T 120 testdb`
-> новое подключение для каждой транзакции
+> новое подключение для каждой транзакции \
+
 **результат:**
 ```
 number of transactions actually processed: 64662
