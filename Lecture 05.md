@@ -2,8 +2,8 @@
 - создадим новый кластер **otus_1**: ```sudo pg_createcluster --locale ru_RU.UTF-8 --start 17 otus_1```
 - ещё раз проверим список работающих кластеров, видим рабочий порт нового кластера - 5433: ```sudo pg_lsclusters```
 - настроим сеть для кластера:
->cd /etc/postgresql/17/otus_1
->sudo nano postgresql.conf: ```listen_addresses = '*'```
+>cd /etc/postgresql/17/otus_1 \
+>sudo nano postgresql.conf: `listen_addresses = '*'` \
 >sudo nano pg_hba.conf:
 ```
 # Database administrative login by Unix domain socket
@@ -14,7 +14,7 @@ local   all             all                                     peer
 # IPv4 local connections:
 host    all             all             192.168.0.0/16          scram-sha-256
 ```
->sudo pg_ctlcluster 17 otus_1 restart
+>sudo pg_ctlcluster 17 otus_1 restart \
 >netstat -tnlpa | grep 5433 \
 (видим: 0 0.0.0.0:5433)
 - заходим в новый кластер:
