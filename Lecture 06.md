@@ -21,7 +21,7 @@ wal_buffers = 16MB
 - переходим в папку с программой: `cd /usr/lib/postgresql/17/bin`
 - инициализируем: `./pgbench -i -p 5433 testdb`
 - запускаем тест: `./pgbench -p 5433 -c 200 -j 4 -P 30 -T 120 testdb`
-> порт 5433 (кластер otus_1); 200 подключений; 4 потока; с выводом отчёта каждые 30 секунд; в течении 120 секунд; база данных testdb \
+> порт 5433 (кластер otus_1); 200 подключений; 4 потока; с выводом отчёта каждые 30 секунд; в течении 120 секунд; база данных testdb
 
 **результат:**
 ```
@@ -33,7 +33,7 @@ initial connection time = 86.101 ms
 tps = 824.337242 (without initial connection time)
 ```
 - добавим к тесту -С: `./pgbench -p 5433 -c 200 -C -j 4 -P 30 -T 120 testdb`
-> новое подключение для каждой транзакции \
+> новое подключение для каждой транзакции
 
 **результат:**
 ```
@@ -48,8 +48,5 @@ tps = 535.861620 (including reconnection times)
 #### Задание со звездой
 
 <div class="text text_p-small text_default learning-markdown js-learning-markdown"><ul>
-<li>нагрузить кластер через утилиту через утилиту pgbench (<a target="_blank" href="https://postgrespro.ru/docs/postgrespro/14/pgbench" title="https://postgrespro.ru/docs/postgrespro/14/pgbench">https://postgrespro.ru/docs/postgrespro/14/pgbench</a>)</li>
-<li>написать какого значения tps удалось достичь, показать какие параметры в какие значения устанавливали и почему</li>
-</ul>
 <p><br>Задание со *: аналогично протестировать через утилиту <a target="_blank" href="https://github.com/Percona-Lab/sysbench-tpcc" title="https://github.com/Percona-Lab/sysbench-tpcc">https://github.com/Percona-Lab/sysbench-tpcc</a> (требует установки<br><a target="_blank" href="https://github.com/akopytov/sysbench" title="https://github.com/akopytov/sysbench">https://github.com/akopytov/sysbench</a>)</p>
 </div>
