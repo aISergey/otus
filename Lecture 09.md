@@ -1,3 +1,24 @@
+
+### Задание со звездой
+
+> вариант с предварительными select:
+```
+create table a (id int primary key, flag boolean);
+insert into a values (1, 't'), (2, 'f');
+```
+** session 1 **: `begin; select flag from a where (id = 1) for update;`
+** session 2 **: `begin; select flag from a where (id = 2) for update;`
+> строки перепутаны, можно блокировать:
+** session 1 **: `update a set flag = 'f';` --> заблокированы второй сессией, ждём...
+** session 2 **: `update a set flag = 't';` -->
+```
+ОШИБКА:  обнаружена взаимоблокировка
+DETAIL:  Процесс 8343 ожидает в режиме ShareLock блокировку "транзакция 740"; заблокирован процессом 8341.
+Процесс 8341 ожидает в режиме ShareLock блокировку "транзакция 741"; заблокирован процессом 8343.
+HINT:  Подробности запроса смотрите в протоколе сервера.
+CONTEXT:  при изменении кортежа (0,1) в отношении "a"
+```
+
 <div class="text text_p-small text_default text_bold">Описание/Пошаговая инструкция выполнения домашнего задания:</div>
 
 <div class="text text_p-small text_default learning-markdown js-learning-markdown"><ol>
