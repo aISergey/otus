@@ -6,11 +6,11 @@
 create table a (id int primary key, flag boolean);
 insert into a values (1, 't'), (2, 'f');
 ```
-** session 1 **: `begin; select flag from a where (id = 1) for update;`
-** session 2 **: `begin; select flag from a where (id = 2) for update;`
+**session 1**: `begin; select flag from a where (id = 1) for update;`
+**session 2**: `begin; select flag from a where (id = 2) for update;`
 > строки перепутаны, можно блокировать:
-** session 1 **: `update a set flag = 'f';` --> заблокированы второй сессией, ждём...
-** session 2 **: `update a set flag = 't';` -->
+**session 1**: `update a set flag = 'f';` --> заблокированы второй сессией, ждём...
+**session 2**: `update a set flag = 't';` -->
 ```
 ОШИБКА:  обнаружена взаимоблокировка
 DETAIL:  Процесс 8343 ожидает в режиме ShareLock блокировку "транзакция 740"; заблокирован процессом 8341.
