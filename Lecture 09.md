@@ -101,7 +101,7 @@ CONTEXT:  при изменении кортежа (0,10) в отношении 
  9646 | relation | tbl      | RowExclusiveLock | t       | 7/6                |      |
  9646 | relation | tbl_pkey | RowExclusiveLock | t       | 7/6                |      |
 ```
-**session 1** ждёт коммита **session 2**
+**session 3** умерла, поэтому **session 2** теперь свободна, а **session 1** ждёт коммита **session 2**
 
 **данные в журнале**:
 ```
