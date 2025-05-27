@@ -128,6 +128,19 @@ select
 
 ## Задание со звездой
 
+Попробуем ответить на вопрос: сколько позиций факта предшествуют плановым позициям?
+
+**накопительные суммы**:
+- планы с накопительной суммой по датам:
+```
+select p1.product_id, p1.plan_date, p1.plan_id, count(*) n
+  from
+    plans p1 inner join plans p2 on (p1.product_id = p2.product_id) and
+                                    ((p1.plan_date > p2.plan_date)
+                                     or ((p1.plan_date = p2.plan_date) and (p1.plan_id >= p2.plan_id)))
+  where (p1.product_id = 44)
+  group by p1.product_id, p1.plan_date, p1.plan_id;
+```
 
 
 <hr>
