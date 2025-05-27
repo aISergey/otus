@@ -18,11 +18,11 @@ insert into facts select id, trunc(random() * 100 + 1), '2025-01-01'::date + tru
 
 ## Соединения таблиц
 
-#### inner join
+### inner join
 
-- **plans**: `select count(*) from plans p inner join products s on (p.product_id = s.product_id);`
+- **plans**: `select count(*) from plans p inner join products s on (p.product_id = s.product_id);` \
 **результат**: count=300 (плановые строки содержат только позиции из справочника номенклатуры)
-- **facts**: `select count(*) from facts f inner join products s on (f.product_id = s.product_id);`
+- **facts**: `select count(*) from facts f inner join products s on (f.product_id = s.product_id);` \
 **результат**: count=300 (строки факта содержат только позиции из справочника номенклатуры)
 - **plans - facts**:
 ```
@@ -35,7 +35,7 @@ select count(*)
 ```
 **результат**: count=87 (в плане и в факте встречается только 87 одинаковых позиций)
 
-#### left join
+### left join
 
 - **plans -> facts**:
 ```
@@ -65,7 +65,7 @@ select
 ```
 **результат**: n_fact=91, n_fact_plan=87 (уже видели в inner join), n_fact_only = 4
 
-#### cross join
+### cross join
 
 - **plans, facts**:
 ```
@@ -79,7 +79,7 @@ select
 ```
 **результат**: count = 8736 (логично: декартово произведение n_plan=96 * n_fact=91)
 
-#### full join
+### full join
 
 - **plans <-> facts**:
 ```
@@ -95,7 +95,7 @@ select
 ```
 **результат**:  n_plan_only=9, n_plan_fact=87, n_fact_only = 4
 
-#### multi join
+### multi join
 
 - **plans - products -> facts**:
 
