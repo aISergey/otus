@@ -128,21 +128,65 @@ select
 
 ## Задание со звездой
 
-Попробуем ответить на вопрос: сколько позиций факта предшествуют плановым позициям?
-
-**накопительные суммы**:
-- планы с накопительной суммой по датам:
+- **общий для всех метрик скрипт**:
 ```
-select p1.product_id, p1.plan_date, p1.plan_id, count(*) n
-  from
-    plans p1 inner join plans p2 on (p1.product_id = p2.product_id) and
-                                    ((p1.plan_date > p2.plan_date)
-                                     or ((p1.plan_date = p2.plan_date) and (p1.plan_id >= p2.plan_id)))
-  where (p1.product_id = 44)
-  group by p1.product_id, p1.plan_date, p1.plan_id;
+explain (analyze)
+select p.*
+  from (
+    select product_id, count(*) q from plans group by product_id
+  ) p inner join (
+    select product_id, count(*) q from facts group by product_id
+  ) f on (p.product_id = f.product_id);
 ```
 
+- **nested loop**
+```
+set enable_nestloop=on;
+set enable_hashjoin=off;
+set enable_mergejoin=off;
+```
+**результат**:
+```
+Nested Loop  (cost=17.25..149.90 rows=91 width=12) (actual time=0.177..0.693 rows=87 loops=1)
+...
+Execution Time: 0.738 ms
+```
 
-<hr>
-<p>Задание со звездочкой*<br>Придумайте 3 своих метрики на основе показанных представлений, отправьте их через ЛК, а так же поделитесь с коллегами в слаке</p>
-</div>
+- **hash join**
+```
+set enable_nestloop=off;
+set enable_hashjoin=on;
+set enable_mergejoin=off;
+```
+**результат** (эффективность по сравнению с "nested loop" выше в разы на текущих структурах!):
+```
+Hash Join  (cost=19.41..21.48 rows=91 width=12) (actual time=0.175..0.196 rows=87 loops=1)
+...
+Execution Time: 0.240 ms
+```
+
+- **merge join** (по сравнению с "hash join" видны дополнительные затраты на сортировку):
+```
+set enable_nestloop=off;
+set enable_hashjoin=off;
+set enable_mergejoin=on;
+```
+**результат**:
+```
+Hash Join  (cost=19.41..21.48 rows=91 width=12) (actual time=0.175..0.196 rows=87 loops=1)
+...
+Execution Time: 0.299 ms
+```
+
+- **а что выбирает оптимизатор?**:
+```
+set enable_nestloop=off;
+set enable_hashjoin=off;
+set enable_mergejoin=on;
+```
+**результат**:
+```
+Hash Join  (cost=19.41..21.48 rows=91 width=12) (actual time=0.188..0.210 rows=87 loops=1)
+...
+Execution Time: 0.245 ms
+```
