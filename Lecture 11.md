@@ -173,7 +173,7 @@ set enable_mergejoin=on;
 ```
 **результат**:
 ```
-Hash Join  (cost=19.41..21.48 rows=91 width=12) (actual time=0.175..0.196 rows=87 loops=1)
+Merge Join  (cost=26.15..28.00 rows=91 width=12) (actual time=0.202..0.233 rows=87 loops=1)
 ...
 Execution Time: 0.299 ms
 ```
