@@ -178,7 +178,7 @@ Merge Join  (cost=26.15..28.00 rows=91 width=12) (actual time=0.202..0.233 rows=
 Execution Time: 0.299 ms
 ```
 
-- **а что выбирает оптимизатор?**:
+- **а что выбирает планировщик?**:
 ```
 set enable_nestloop=on;
 set enable_hashjoin=on;
