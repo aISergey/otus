@@ -180,8 +180,8 @@ Execution Time: 0.299 ms
 
 - **а что выбирает оптимизатор?**:
 ```
-set enable_nestloop=off;
-set enable_hashjoin=off;
+set enable_nestloop=on;
+set enable_hashjoin=on;
 set enable_mergejoin=on;
 ```
 **результат**:
