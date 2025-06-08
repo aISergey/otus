@@ -101,19 +101,19 @@ Execution Time: 29.822 ms
 ### Индекс на два поля
 
 - **предварительно удалим все эти индексы**: `select * from pg_indexes where tablename = 'test_index';`
-- **запрос**: `explain (analyze) select * from test_index where (col_id between 150000 and 650000) and (col_txt like '%6 1%');` \
+- **запрос**: `explain (analyze) select * from test_index where (col_id between 50000 and 250000) and (col_txt like '%6 1%');` \
 **результат**:
 ```
-Gather  (cost=1000.00..15649.67 rows=50 width=30) (actual time=9.239..47.165 rows=5003 loops=1)
+Gather  (cost=1000.00..15646.67 rows=20 width=30) (actual time=3.297..44.106 rows=1991 loops=1)
   Workers Planned: 2
   Workers Launched: 2
-  ->  Parallel Seq Scan on test_index  (cost=0.00..14644.67 rows=21 width=30) (actual time=3.022..25.745 rows=1668 loops=3)
-        Filter: ((col_id >= 150000) AND (col_id <= 650000) AND (col_txt ~~ '%6 1%'::text))
-        Rows Removed by Filter: 331666
-Planning Time: 0.121 ms
-Execution Time: 47.314 ms
+  ->  Parallel Seq Scan on test_index  (cost=0.00..14644.67 rows=8 width=30) (actual time=4.154..21.886 rows=664 loops=3)
+        Filter: ((col_id >= 50000) AND (col_id <= 250000) AND (col_txt ~~ '%6 1%'::text))
+        Rows Removed by Filter: 332670
+Planning Time: 0.128 ms
+Execution Time: 44.212 ms
 ```
-**результат после создания индекса по двум полям**: `create index on test_index(col_id,col_txt); analyze test_index;`
+**результат после создания индекса по двум полям**: ``
 ```
 
 ```
