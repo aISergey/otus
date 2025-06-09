@@ -101,20 +101,43 @@ Execution Time: 29.822 ms
 ### Индекс на два поля
 
 - **предварительно удалим все эти индексы**: `select * from pg_indexes where tablename = 'test_index';`
-- **запрос**: `explain (analyze) select * from test_index where (col_id between 50000 and 250000) and (col_txt like '%6 1%');` \
+- **запрос**: `explain (costs, analyze) select * from test_index where (col_id between 50000 and 250000) and (col_txt like '61%');` \
 **результат**:
 ```
-Gather  (cost=1000.00..15646.67 rows=20 width=30) (actual time=3.297..44.106 rows=1991 loops=1)
+Gather  (cost=1000.00..15846.47 rows=2018 width=30) (actual time=3.068..41.343 rows=1996 loops=1)
   Workers Planned: 2
   Workers Launched: 2
-  ->  Parallel Seq Scan on test_index  (cost=0.00..14644.67 rows=8 width=30) (actual time=4.154..21.886 rows=664 loops=3)
-        Filter: ((col_id >= 50000) AND (col_id <= 250000) AND (col_txt ~~ '%6 1%'::text))
-        Rows Removed by Filter: 332670
-Planning Time: 0.128 ms
-Execution Time: 44.212 ms
+  ->  Parallel Seq Scan on test_index  (cost=0.00..14644.67 rows=841 width=30) (actual time=0.945..34.440 rows=665 loops=3)
+        Filter: ((col_id >= 50000) AND (col_id <= 250000) AND (col_txt ~~ '61%'::text))
+        Rows Removed by Filter: 332668
+Planning Time: 0.115 ms
+Execution Time: 41.429 ms
 ```
-**результат после создания индекса по двум полям**: ``
+**результат после создания индекса по двум полям отдельно**: `create index on test_index(col_id); create index on test_index(col_txt); analyze test_index;`
 ```
+Gather  (cost=1000.42..6365.93 rows=2007 width=30) (actual time=0.406..22.544 rows=1996 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  ->  Parallel Index Scan using test_index_col_id_idx on test_index  (cost=0.42..5165.23 rows=836 width=30) (actual time=0.088..16.606 rows=665 loops=3)
+        Index Cond: ((col_id >= 50000) AND (col_id <= 250000))
+        Filter: (col_txt ~~ '61%'::text)
+        Rows Removed by Filter: 66002
+Planning Time: 0.261 ms
+Execution Time: 22.649 ms
+```
+**комментарий**: `получилось ускорить запрос, но только за счёт индекса на col_id` \
 
+**результат после создания составного индекса по двум полям**: `create index on test_index(col_id, col_txt); analyze test_index;`
 ```
-**комментарий**: ` `
+Gather  (cost=1000.42..10048.72 rows=2018 width=30) (actual time=0.304..23.894 rows=1996 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  ->  Parallel Index Scan using test_index_col_id_col_txt_idx on test_index  (cost=0.42..8846.92 rows=841 width=30) (actual time=0.082..19.364 rows=665 loops=3)
+        Index Cond: ((col_id >= 50000) AND (col_id <= 250000))
+        Filter: (col_txt ~~ '61%'::text)
+        Rows Removed by Filter: 66002
+Planning Time: 0.210 ms
+Execution Time: 23.993 ms
+```
+**комментарий**: `с текстовым полем по-прежнему проблемы` \
+`параметр: set random_page_cost = 1.15 .. 1000; так ничего и не дал...`
