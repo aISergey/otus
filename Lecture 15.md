@@ -1,14 +1,12 @@
-<h2 class="learning-near__header">Домашнее задание</h2>
-            
-<div class="text text_p-small text_default learning-markdown js-learning-markdown"><p>Секционирование таблицы</p></div>
+## Подготовка данных
 
-<div class="text text_p-small text_default text_bold">Цель:</div>
-<div class="text text_p-small text_default learning-markdown js-learning-markdown">
-  <p>научиться выполнять секционирование таблиц в PostgreSQL;<br>повысить производительность запросов и упростив управление данными;</p>
-</div>
+- загрузил базу **demo-medium**
+- размеры таблиц: `boarding_passes=263М, ticket_flights=245М, tickets=133М, bookings=42М, ...`
 
-<div class="text text_p-small text_default text_bold">Описание/Пошаговая инструкция выполнения домашнего задания:</div> 
-<div class="text text_p-small text_default learning-markdown js-learning-markdown"><p>На основе готовой базы данных примените один из методов секционирования в зависимости от структуры данных.<br><a target="_blank" href="https://postgrespro.ru/education/demodb" title="https://postgrespro.ru/education/demodb">https://postgrespro.ru/education/demodb</a><br><br><br><br><strong>Шаги выполнения домашнего задания:</strong><br><br><br><br><strong>Анализ структуры данных:</strong></p>
+## Секционирование таблицы
+
+- 
+
 <ul>
 <li>Ознакомьтесь с таблицами базы данных, особенно с таблицами bookings, tickets, ticket_flights, flights, boarding_passes, seats, airports, aircrafts.</li>
 <li>Определите, какие данные в таблице bookings или других таблицах имеют логическую привязку к диапазонам, по которым можно провести секционирование (например, дата бронирования, рейсы).</li>
