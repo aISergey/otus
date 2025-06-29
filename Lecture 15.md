@@ -3,49 +3,86 @@
 - загрузил базу **demo-medium**
 - размеры таблиц: `boarding_passes=263М, ticket_flights=245М, tickets=133М, bookings=42М, ...`
 
-## Секционирование таблицы
+## Секционирование таблицы boarding_passes
 
-- 
+- попробуем разбить на секции **boarding_passes** (как самую большую) по посадочным номерам:
+```
+select right(s.seat_no, 1), count(*) n
+  from bookings.boarding_passes s
+  group by 1
+  order by count(*) desc;
+```
+- всего 10 буквенных рядов, но лишь 6 диапазонов по примерному равенству количеств:
+```
+A	359512
+D	339715
+C	315815
+F	273241
+E	234615
+B,G,H,K,J 371397
+```
+- создаём секционированную таблицу по списку:
+```
+create table bookings.boarding_passes_partitioned (
+  ticket_no bpchar(13) not null,
+  flight_id int4 not null,
+  boarding_no int4 not null,
+  seat_no varchar(4) not null
+)
+partition by list (right(seat_no, 1));
+--
+create table boarding_passes_partitioned_A partition of boarding_passes_partitioned for values in ('A');
+create table boarding_passes_partitioned_D partition of boarding_passes_partitioned for values in ('D');
+create table boarding_passes_partitioned_C partition of boarding_passes_partitioned for values in ('C');
+create table boarding_passes_partitioned_F partition of boarding_passes_partitioned for values in ('F');
+create table boarding_passes_partitioned_E partition of boarding_passes_partitioned for values in ('E');
+create table boarding_passes_partitioned_def partition of boarding_passes_partitioned default;
+```
+- перенесём данные: `insert into bookings.boarding_passes_partitioned select * from bookings.boarding_passes;`
+- проверим: `select right(s.seat_no, 1), count(*) n from bookings.boarding_passes_partitioned_A s group by 1;`
+**результат**: A	359512 (вау!)
 
-<ul>
-<li>Ознакомьтесь с таблицами базы данных, особенно с таблицами bookings, tickets, ticket_flights, flights, boarding_passes, seats, airports, aircrafts.</li>
-<li>Определите, какие данные в таблице bookings или других таблицах имеют логическую привязку к диапазонам, по которым можно провести секционирование (например, дата бронирования, рейсы).</li>
-</ul>
-<p><br><br><br><strong>Выбор таблицы для секционирования:</strong><br>Основной акцент делается на секционировании таблицы bookings. Но вы можете выбрать и другие таблицы, если видите в этом смысл для оптимизации производительности (например, flights, boarding_passes).<br>Обоснуйте свой выбор: почему именно эта таблица требует секционирования? Какой тип данных является ключевым для секционирования?<br><br><br><br><strong>Определение типа секционирования:</strong><br>Определитесь с типом секционирования, которое наилучшим образом подходит для ваших данных:</p>
-<ul>
-<li>По диапазону (например, по дате бронирования или дате рейса).</li>
-<li>По списку (например, по пунктам отправления или по номерам рейсов).</li>
-<li>По хэшированию (для равномерного распределения данных).<br><br><br></li>
-</ul>
-<p><strong>Создание секционированной таблицы:</strong><br>Преобразуйте таблицу в секционированную с выбранным типом секционирования.<br>Например, если вы выбрали секционирование по диапазону дат бронирования, создайте секции по месяцам или годам.<br><br><br><br><strong>Миграция данных:</strong></p>
-<ul>
-<li>Перенесите существующие данные из исходной таблицы в секционированную структуру.</li>
-<li>Убедитесь, что все данные правильно распределены по секциям.</li>
-</ul>
-<p><br><br><br><strong>Оптимизация запросов:</strong></p>
-<ul>
-<li>Проверьте, как секционирование влияет на производительность запросов. Выполните несколько выборок данных до и после секционирования для оценки времени выполнения.</li>
-<li>Оптимизируйте запросы при необходимости (например, добавьте индексы на ключевые столбцы).</li>
-</ul>
-<p><br><br><br><strong>Тестирование решения:</strong><br>Протестируйте секционирование, выполняя несколько запросов к секционированной таблице.<br>Проверьте, что операции вставки, обновления и удаления работают корректно.<br><br><br><br><strong>Документирование:</strong></p>
-<ul>
-<li>Добавьте комментарии к коду, поясняющие выбранный тип секционирования и шаги его реализации.</li>
-<li>Опишите, как секционирование улучшает производительность запросов и как оно может быть полезно в реальных условиях.</li>
-</ul>
-<p><br><br><br><strong>Формат сдачи:</strong></p>
-<ul>
-<li>SQL-скрипты с реализованным секционированием.</li>
-<li>Краткий отчет с описанием процесса и результатами тестирования.</li>
-<li>Пример запросов и результаты до и после секционирования.</li>
-</ul>
-</div>
+### Анализ результата
 
-<div class="text text_p-small text_default text_bold">Критерии оценки:</div>
-<div class="text text_p-small text_default learning-markdown js-learning-markdown">
-  <p>Корректность секционирования – таблица должна быть разделена логично и эффективно.<br>
-    Выбор типа секционирования – обоснование выбранного типа (например, секционирование по диапазону дат рейсов или по месту отправления/прибытия).<br>
-    Работоспособность решения – код должен успешно выполнять секционирование без ошибок.<br>
-    Оптимизация запросов – после секционирования, запросы к таблице должны быть оптимизированы (например, быстрее выполняться для конкретных диапазонов).<br>
-    Комментирование – код должен содержать поясняющие комментарии, объясняющие выбор секционирования и основные шаги.
-  </p>
-</div>
+- исходная таблица: `explain (analyze) select * from bookings.boarding_passes s where (right(s.seat_no, 1) = 'A');`
+```
+Gather  (cost=1000.00..27738.44 rows=9471 width=25) (actual time=0.267..105.420 rows=359512 loops=1)
+  Workers Planned: 2
+  Workers Launched: 2
+  ->  Parallel Seq Scan on boarding_passes s  (cost=0.00..25791.34 rows=3946 width=25) (actual time=0.027..91.361 rows=119837 loops=3)
+        Filter: ("right"((seat_no)::text, 1) = 'A'::text)
+        Rows Removed by Filter: 511594
+Execution Time: 113.744 ms
+```
+- секционированная таблица: `explain (analyze) select * from bookings.boarding_passes_partitioned p where (right(p.seat_no, 1) = 'A');`
+```
+Gather  (cost=1000.00..6995.96 rows=1798 width=25) (actual time=0.204..40.618 rows=359512 loops=1)
+  Workers Planned: 1
+  Workers Launched: 1
+  ->  Parallel Seq Scan on boarding_passes_partitioned_a p  (cost=0.00..5816.16 rows=1058 width=25) (actual time=0.009..24.275 rows=179756 loops=2)
+        Filter: ("right"((seat_no)::text, 1) = 'A'::text)
+Execution Time: 49.855 ms
+```
+**результат**: прирост скорости в 2.5 раза, впечатляет!
+
+### Добавим ограничения
+
+- восстановим FK:
+```
+ALTER TABLE bookings.boarding_passes_partitioned
+  ADD CONSTRAINT boarding_passes_partitioned_ticket_no_fkey
+    FOREIGN KEY (ticket_no, flight_id)
+    REFERENCES bookings.ticket_flights(ticket_no,flight_id);
+```
+**результат**: скрипт прошёл без проблем, предыдущий запрос на скорость вернул тот же результат.
+
+- попытка восстановить уникальные ключи потерпела крах - "Ограничения UNIQUE не могут использоваться, когда ключи секционирования включают выражения". Пример:
+```
+ALTER TABLE bookings.boarding_passes_partitioned
+  ADD CONSTRAINT boarding_passes_partitioned_flight_id_boarding_no_key
+  UNIQUE (flight_id, boarding_no);
+```
+
+## Общий вывод
+
+Для секционирования таблицы существенным ограничением является наличие уникальных ключей. Поэтому секционировать желательно по "естественному ключу" - полю (или полям), а не выражению.
