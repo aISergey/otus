@@ -1,22 +1,69 @@
-<h2 class="learning-near__header">Домашнее задание</h2>
-          
-<div class="text text_p-small text_default learning-markdown js-learning-markdown"><p>Триггеры, поддержка заполнения витрин</p></div>
+## Подготовка данных
 
-<div class="text text_p-small text_default text_bold">Цель:</div>
-<div class="text text_p-small text_default learning-markdown js-learning-markdown"><p> Создать триггер для поддержки витрины в актуальном состоянии.</p></div>
-<br>
-<div class="text text_p-small text_default text_bold">Описание/Пошаговая инструкция выполнения домашнего задания:</div> 
+- выполним скрипт, создадим и заполним исходные таблицы **goods, sales, good_sum_mart**
 
-<div class="text text_p-small text_default learning-markdown js-learning-markdown">
-  <p><br>Скрипт и развернутое описание задачи – в ЛК (файл hw_triggers.sql) или по ссылке:
-    <a target="_blank" href="https://disk.yandex.ru/d/l70AvknAepIJXQ" title="https://disk.yandex.ru/d/l70AvknAepIJXQ">https://disk.yandex.ru/d/l70AvknAepIJXQ</a>
-  </p>
-  <p><br>В БД создана структура, описывающая товары (таблица goods) и продажи (таблица sales).</p>
-  <p><br>Есть запрос для генерации отчета – сумма продаж по каждому товару.</p>
-  <p><br>БД была денормализована, создана таблица (витрина), структура которой повторяет структуру отчета.</p>
-  <p><br>Создать триггер на таблице продаж, для поддержки данных в витрине в актуальном состоянии (вычисляющий при каждой продаже сумму и записывающий её в витрину)</p>
-  <p><br>Подсказка: не забыть, что кроме INSERT есть еще UPDATE и DELETE</p>
-  <hr>
-    <p>Задание со звездочкой* </p>
-    <p>Чем такая схема (витрина+триггер) предпочтительнее отчета, создаваемого "по требованию" (кроме производительности)?<br>Подсказка: В реальной жизни возможны изменения цен.</p>
-</div>
+## Создадим триггер к sales
+
+- создадим триггеры (для скорости работы, триггеры будут **for each statement**):
+```
+create or replace function pract_functions.tiud_sales()
+returns trigger as $$
+begin
+  -- для простоты кода, полностью обновим изменяемые данные
+  delete from pract_functions.good_sum_mart s
+    using
+      upd_data w inner join pract_functions.goods g on (w.good_id = g.goods_id)
+    where
+      -- join
+      (s.good_name = g.good_name);
+  --
+  insert into pract_functions.good_sum_mart (good_name, sum_sale)
+    select g.good_name, sum(g.good_price * s.sales_qty) as sum_sale
+      from
+        upd_data w
+          inner join pract_functions.goods g on (w.good_id = g.goods_id)
+          inner join sales s on (g.goods_id = s.good_id)
+      group by g.good_name;
+  --
+  return null;
+end; $$ language plpgsql;
+--
+create or replace trigger sales_ins
+  after insert on pract_functions.sales
+  referencing NEW table as upd_data
+  for each statement execute function pract_functions.tiud_sales();
+--
+create or replace trigger sales_upd
+  after update on pract_functions.sales
+  referencing OLD table as old_data NEW table as upd_data
+  for each statement execute function pract_functions.tiud_sales();
+--
+create or replace trigger sales_del
+  after delete on pract_functions.sales
+  referencing OLD table as upd_data
+  for each statement execute function pract_functions.tiud_sales();
+```
+- контрольные скрипты:
+```
+select g.good_name, sum(g.good_price * s.sales_qty)
+  from
+    pract_functions.goods g
+      inner join pract_functions.sales s on (g.goods_id = s.good_id)
+  group by g.good_name;
+--
+select * from pract_functions.good_sum_mart;
+```
+
+- проверим работу триггеров:
+```
+insert into pract_functions.sales (good_id, sales_qty) VALUES (1, 40);
+-- запустить контрольные скрипты
+update sales set sales_qty = 60 where (sales_id = 7);
+-- запустить контрольные скрипты
+delete from sales where (sales_id = 7);
+-- запустить контрольные скрипты
+```
+
+## Задание со звездой
+
+- отторгаемые отчётные данные могут быть полезны для регистрации истории отчётности, что в принципе не возможно для запроса "по требованию", так как конструкция `goods g inner join sales s on (g.goods_id = s.good_id)` всегда будет брать текущее значение цен в goods.
