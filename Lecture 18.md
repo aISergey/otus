@@ -16,15 +16,19 @@ begin
     where
       -- join
       (s.good_name = g.good_name);
-  --
+  -- UPDATED 22.07.2025 START
   insert into pract_functions.good_sum_mart (good_name, sum_sale)
-    select g.good_name, sum(g.good_price * s.sales_qty) as sum_sale
-      from
-        upd_data w
-          inner join pract_functions.goods g on (w.good_id = g.goods_id)
-          inner join sales s on (g.goods_id = s.good_id)
-      group by g.good_name;
-  --
+    select s.good_name, s.sum_sale
+      from (
+        select g.good_name, sum(g.good_price * s.sales_qty) as sum_sale
+          from
+            upd_data w
+              inner join pract_functions.goods g on (w.good_id = g.goods_id)
+              inner join sales s on (g.goods_id = s.good_id)
+          group by g.good_name
+      ) s
+      on conflict (good_name) do update set sum_sale = EXCLUDED.sum_sale;
+  -- UPDATED END
   return null;
 end; $$ language plpgsql;
 --
