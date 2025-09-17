@@ -11,8 +11,8 @@ wal_log_hints = on
 ```
 host   replication   all   192.168.0.0/16   scram-sha-256
 ```
-> рестартуем кластер: `sudo pg_ctlcluster 17 main restart`
-- настроим сервер баз данных:
+> рестартуем кластер: `sudo pg_ctlcluster 17 main restart` \
+> настроим сервер баз данных:
 ```
 su postgres
 psql
