@@ -54,7 +54,7 @@ create subscription sub_srv1_db1_test1
      run_as_owner = false, password_required = true, origin = 'any');
 select * from test1; -- должна появиться строка с данными!!!
 ```
-интересно: PgAdmin, при формировании SQL-скрипта, теряет параметр password !!!
+**интересно**: PgAdmin, при формировании SQL-скрипта, теряет параметр password !!!
 > создадим публикацию для **ВМ1**:
 ```
 create table test2(id int primary key, nm text);
