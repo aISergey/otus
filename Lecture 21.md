@@ -91,11 +91,13 @@ create subscription sub_srv1_db1_test1
     (connect = true, enabled = true, copy_data = true, create_slot = true, synchronous_commit = 'off',
      binary = false, streaming = 'False', two_phase = false, disable_on_error = false,
      run_as_owner = false, password_required = true, origin = 'any');
--- ошибка!!! слот репликации sub_srv1_db1_test1 уже существует.
--- гм. этот слот должен быть уникальным для источника, а не для приёмника?! неожиданно.
--- читаем документацию: https://www.postgresql.org/docs/current/sql-createsubscription.html
--- **this command normally creates a replication slot on the publisher**
--- понятно, тогда бест-практика **обязательно задавать имя слота!!!***
+```
+> ошибка!!! слот репликации sub_srv1_db1_test1 уже существует. \
+> гм. этот слот должен быть уникальным для источника, а не для приёмника?! неожиданно. \
+> читаем документацию: https://www.postgresql.org/docs/current/sql-createsubscription.html \
+> **this command normally creates a replication slot on the publisher** \
+> понятно, тогда бест-практика **обязательно задавать имя слота!!!***
+```
 create subscription sub_srv1_db1_test1
   connection 'host=192.168.0.17 port=5432 user=usr_repl password=usr dbname=db1 connect_timeout=10 sslmode=prefer'
   publication pub_db1_test1 with
@@ -115,9 +117,9 @@ create subscription sub_srv2_db2_test2
      run_as_owner = false, password_required = true, origin = 'any');
 select * from test2; -- должна появиться строка с данными!!!
 ```
-    
-    <ol>
-      <li>3 ВМ использовать как реплику для чтения и бэкапов (подписаться на таблицы из ВМ №1 и №2 ). </li>
-    </ol>
 
-    <p><br>* реализовать горячее реплицирование для высокой доступности на 4ВМ. Источником должна выступать ВМ №3. Написать с какими проблемами столкнулись.</p>
+### Задание со звездой
+
+
+
+<p><br>* реализовать горячее реплицирование для высокой доступности на 4ВМ. Источником должна выступать ВМ №3.</p>
