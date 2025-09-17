@@ -96,7 +96,7 @@ create subscription sub_srv1_db1_test1
 > гм. этот слот должен быть уникальным для источника, а не для приёмника?! неожиданно. \
 > читаем документацию: https://www.postgresql.org/docs/current/sql-createsubscription.html \
 > **this command normally creates a replication slot on the publisher** \
-> понятно, тогда бест-практика **обязательно задавать имя слота!!!***
+> понятно, тогда бест-практика **обязательно задавать имя слота!!!**
 ```
 create subscription sub_srv1_db1_test1
   connection 'host=192.168.0.17 port=5432 user=usr_repl password=usr dbname=db1 connect_timeout=10 sslmode=prefer'
