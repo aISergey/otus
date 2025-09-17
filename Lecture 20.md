@@ -1,38 +1,46 @@
-<div class="learning-near__item">
-  <h2 class="learning-near__header">Домашнее задание</h2>
-  <div class="text text_p-small text_default learning-markdown js-learning-markdown"><p>Бэкапы</p></div>
+## Логический бэкап COPY
 
-  <div class="text text_p-small text_default text_bold">Цель:</div>
-  <div class="text text_p-small text_default learning-markdown js-learning-markdown">
-    <ul>
-      <li>применить логический бэкап. Восстановиться из бэкапа.</li>
-  </ul>
-  </div>
-  <br>
-  <div class="text text_p-small text_default text_bold">Описание/Пошаговая инструкция выполнения домашнего задания:</div> 
-  <div class="text text_p-small text_default learning-markdown js-learning-markdown">
-    <ol>
-      <li>Создаем ВМ/докер c ПГ.</li>
-      <li>Создаем БД, схему и в ней таблицу.</li>
-      <li>Заполним таблицы автосгенерированными 100 записями.</li>
-      <li>Под линукс пользователем Postgres создадим каталог для бэкапов</li>
-      <li>Сделаем логический бэкап используя утилиту COPY</li>
-      <li>Восстановим в 2 таблицу данные из бэкапа.</li>
-      <li>Используя утилиту pg_dump создадим бэкап в кастомном сжатом формате двух таблиц</li>
-      <li>Используя утилиту pg_restore восстановим в новую БД только вторую таблицу!</li>
-    </ol>
-    <p><br>ДЗ сдается в виде миниотчета на гитхабе с описанием шагов и с какими проблемами столкнулись.</p>
-  </div>
-  <br>
-  
-  <div class="text text_p-small text_default text_bold">Критерии оценки:</div>
-  <div class="text text_p-small text_default learning-markdown js-learning-markdown"><p>Выполнение ДЗ: 10 баллов</p>
-    <ul>
-      <li>2 балл за красивое решение</li>
-    </ul>
-    <ul>
-      <li>2 балл за рабочее решение, и недостатки указанные преподавателем не устранены</li>
-    </ul>
-  </div>
-  <br>
-</div>
+- создаём тестовую таблицу и заполним её 100 записями (в ранее созданной БД **test_backup**): 
+```
+su postgres
+psql
+\c test_backup
+create table test1(c text);
+insert into test1(c) select md5(random()::text)::char(10) from generate_series(1,100);
+select count(*) from test1;
+\q
+```
+- создадим папку для бэкапов (под root):
+```
+cd /home
+mkdir backup
+chown -R postgres:postgres backup
+```
+- возвращаемся в сессию **postgres**, и делаем бэкап таблицы: `\copy test1 to '/home/backup/test1.sql';`
+- посмотрим на файл в сессии **root**: `nano /home/backup/test1.sql`
+- в сессии  **postgres** восстановим данные в новую таблицу:
+```
+create table test2(c text);
+\copy test2 from '/home/backup/test1.sql';
+select count(*) from test2;
+```
+
+## Логический бэкап PG_DUMP
+
+- в предыдущем задании была база **test_backup** с двумя таблицами (**test1** и **test2**), \
+  создадим архив базы **test_backup**:
+```
+pg_dump -d test_backup -Fc > /home/backup/test_backup.gz
+ls -l /home/backup
+```
+- восстановим из backup в новую базу данных таблицу **test2**:
+```
+psql
+create database test_backup_restore;
+\q
+pg_restore -d test_backup_restore -t test2 /home/backup/test_backup.gz
+psql
+\c test_backup_restore
+\dt
+select count(*) from test2;
+```
