@@ -81,11 +81,11 @@ select * from test2; -- должна появиться строка с данн
 ```
 
 #### ВМ3
-- подпишемся на таблицу db1.public.test1 (без primary key)
+- подпишемся на таблицу db1.public.test1
 ```
 create database db3;
 \c db3
-create table test1(col_int int, col_str text);
+create table test1(col_int int primary key, col_str text);
 create subscription sub_srv1_db1_test1
   connection 'host=192.168.0.17 port=5432 user=usr_repl password=usr dbname=db1 connect_timeout=10 sslmode=prefer'
   publication pub_db1_test1 with
