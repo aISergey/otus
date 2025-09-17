@@ -39,8 +39,8 @@ insert into test1(col_int, col_str) values (11, 'test 11');
 - настройка кластера аналогична **ВМ1** (т.к. тоже будем публиковать данные)
 - настройка сервера баз данных аналогична **ВМ1** (пароль пусть будет usr2)
 - настроим структуру для подписки, и учтём текст из документации:
-> https://www.postgresql.org/docs/current/logical-replication-subscription.html
-> **Replication to differently-named tables on the subscriber is not supported.**
+> https://www.postgresql.org/docs/current/logical-replication-subscription.html \
+> **Replication to differently-named tables on the subscriber is not supported.** \
 > т.е. придётся создавать одноимённую таблицу...
 ```
 create database db2;
