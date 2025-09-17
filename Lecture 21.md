@@ -59,6 +59,7 @@ select * from test1; -- должна появиться строка с данн
 > создадим публикацию для **ВМ1**:
 ```
 create table test2(id int primary key, nm text);
+alter table if exists public.test2 replica identity full;
 insert into test2(id, nm) values (21, 'test 21');
 grant select on table public.test2 to usr_repl;
 create publication pub_db2_test2
